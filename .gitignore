@@ -1,0 +1,18 @@
+# Environment Variables
+.env
+
+# Virtual Environment
+venv/
+__pycache__/
+*.pyc
+
+# Database
+finance.db
+*.sqlite3
+*.db
+
+# OS / Editor files
+.DS_Store
+.vscode/
+.idea/
+

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PaisaPilot AI – AI-Powered Personal Finance Management System</title>
+  
+  <!-- Modern Fintech Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js 4.4 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <!-- ========================================================
+         SIDEBAR NAVIGATION
+         ======================================================== -->
+    <aside class="app-sidebar" id="sidebar">
+      <div class="brand-section">
+        <div class="brand-logo-icon">
+          <!-- Logo Icon: Paisa / Flight Wing SVG -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
+            <line x1="12" y1="22" x2="12" y2="12"></line>
+            <polyline points="22 8.5 12 12 2 8.5"></polyline>
+            <polyline points="6 14 12 17.5 18 14"></polyline>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">PaisaPilot <span>AI</span></div>
+          <div class="brand-sub">Finance System</div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-menu">
+        <a class="nav-item active" data-tab="dashboard" href="#dashboard">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a class="nav-item" data-tab="transactions" href="#transactions">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+          <span>Transactions</span>
+        </a>
+
+        <a class="nav-item" data-tab="analysis" href="#analysis">
+          <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          <span>Spending Analysis</span>
+        </a>
+
+        <a class="nav-item" data-tab="advisor" href="#advisor">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          <span>AI Savings Advisor</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="college-badge">
+          <strong>AI for Finance CIA-2</strong>
+          Academic FinTech Project
+          <div style="font-size: 0.7rem; color: var(--text-light); margin-top: 4px;">Google Gemini 2.5 Flash</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========================================================
+         MAIN APPLICATION AREA
+         ======================================================== -->
+    <main class="app-main">
+      <!-- Top Sticky Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="page-title-box">
+            <h1 id="pageTitle">Financial Dashboard</h1>
+            <p id="pageSubtitle">Live snapshot of your income, expenses, and savings</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- AI Status Pill (Clickable for API Key Modal) -->
+          <div id="aiStatusPill" class="ai-status-pill {{ ai_status.badge_class }}" title="Click to configure Gemini API Key">
+            <span class="status-dot"></span>
+            <span>{{ ai_status.badge_text }}</span>
+          </div>
+
+          <!-- Currency Indicator -->
+          <span class="currency-pill">₹ INR</span>
+
+          <!-- Dark/Light Theme Toggle -->
+          <button class="icon-btn" id="themeToggleBtn" title="Toggle Dark/Light Mode" aria-label="Toggle theme">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+
+          <!-- Reset Sample Data -->
+          <button class="icon-btn" id="resetDataBtn" title="Reset Demo Data">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+          </button>
+
+          <!-- Quick Add Button -->
+          <button class="btn-primary" id="openAddModalBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Add Transaction</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Tab Panes Container -->
+      <div class="page-container">
+        
+        <!-- ====================================================
+             TAB 1: FINANCIAL DASHBOARD
+             ==================================================== -->
+        <div class="tab-pane active" id="tab-dashboard">
+          
+          <!-- Key Metric Stats Grid -->
+          <div class="stats-grid">
+            <!-- Total Income -->
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-title">Total Income</span>
+                <div class="stat-icon income">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                </div>
+              </div>
+              <div class="stat-value" id="dashTotalIncome" style="color: var(--success);">₹0.00</div>
+              <div class="stat-footer">
+                <span>Monthly inflows recorded</span>
+              </div>
+            </div>
+
+            <!-- Total Expenses -->
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-title">Total Expenses</span>
+                <div class="stat-icon expense">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                </div>
+              </div>
+              <div class="stat-value" id="dashTotalExpenses" style="color: var(--danger);">₹0.00</div>
+              <div class="stat-footer">
+                <span>Categorized outflow</span>
+              </div>
+            </div>
+
+            <!-- Available Balance -->
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-title">Available Balance</span>
+                <div class="stat-icon balance">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                </div>
+              </div>
+              <div class="stat-value" id="dashAvailableBalance">₹0.00</div>
+              <div class="stat-footer">
+                <span id="dashHealthStatus">Status: Calculating</span>
+              </div>
+            </div>
+
+            <!-- Monthly Savings -->
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-title">Monthly Savings</span>
+                <div class="stat-icon savings">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+              </div>
+              <div class="stat-value" id="dashMonthlySavings">₹0.00</div>
+              <div class="stat-footer">
+                <span class="badge-rate success" id="dashSavingsRateBadge">0% Savings Rate</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Financial Snapshot Banner -->
+          <div class="ai-snapshot-banner">
+            <div class="banner-left">
+              <div class="banner-spark-icon">✨</div>
+              <div class="banner-text">
+                <h3>AI Financial Health Snapshot</h3>
+                <p id="aiSnapshotText">Loading intelligent analysis of your current database records...</p>
+              </div>
+            </div>
+            <button class="btn-secondary" onclick="App.switchTab('advisor')">
+              <span>View Full AI Advice</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+          </div>
+
+          <!-- Charts Grid -->
+          <div class="charts-grid-dashboard">
+            <!-- Income vs Expense Visualizer -->
+            <div class="card">
+              <div class="card-header-flex">
+                <div>
+                  <h3 class="card-title">Income vs Expense Visualizer</h3>
+                  <p class="card-subtitle">Real-time comparison based on SQLite records</p>
+                </div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="dashIncomeExpenseChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Spending Distribution Doughnut -->
+            <div class="card">
+              <div class="card-header-flex">
+                <div>
+                  <h3 class="card-title">Expense Distribution</h3>
+                  <p class="card-subtitle">Breakdown by category</p>
+                </div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="dashCategoryDoughnut"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Transactions Preview -->
+          <div class="card recent-transactions-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Recent Transactions</h3>
+                <p class="card-subtitle">Last 5 financial records</p>
+              </div>
+              <a href="#transactions" onclick="App.switchTab('transactions')" style="color: var(--primary); font-weight: 600; font-size: 0.88rem; text-decoration: none;">View All Transactions &rarr;</a>
+            </div>
+            <div class="table-container">
+              <table class="fin-table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th style="text-align: right;">Amount (INR)</th>
+                  </tr>
+                </thead>
+                <tbody id="dashRecentTableBody">
+                  <!-- Populated dynamically via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ====================================================
+             TAB 2: TRANSACTIONS MANAGEMENT
+             ==================================================== -->
+        <div class="tab-pane" id="tab-transactions">
+          
+          <!-- Transactions Toolbar -->
+          <div class="transactions-toolbar">
+            <div class="toolbar-filters">
+              <!-- Search Box -->
+              <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="txSearch" placeholder="Search by description or category...">
+              </div>
+
+              <!-- Type Toggle Buttons -->
+              <div class="type-toggle-group">
+                <button class="type-toggle-btn active" data-type="all">All</button>
+                <button class="type-toggle-btn" data-type="income">Income</button>
+                <button class="type-toggle-btn" data-type="expense">Expense</button>
+              </div>
+
+              <!-- Category Dropdown -->
+              <select id="txCategoryFilter" class="filter-select">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}">{{ cat }}</option>
+                {% endfor %}
+              </select>
+
+              <!-- Sort Dropdown -->
+              <select id="txSort" class="filter-select">
+                <option value="date_desc">Latest Date First</option>
+                <option value="date_asc">Oldest Date First</option>
+                <option value="amount_desc">Highest Amount</option>
+                <option value="amount_asc">Lowest Amount</option>
+              </select>
+            </div>
+
+            <!-- Export Tools -->
+            <div style="display: flex; gap: 8px;">
+              <a href="/api/export/csv" class="btn-secondary" title="Export CSV file">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Export CSV</span>
+              </a>
+              <a href="/api/export/json" class="btn-secondary" title="Export JSON file">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>JSON</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Transaction List Table -->
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+              <span id="txFilteredCount" style="font-weight: 700; font-size: 0.9rem;">0 Transactions</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Real-time SQLite database synchronization</span>
+            </div>
+
+            <div class="table-container" style="border: none; border-radius: 0;">
+              <table class="fin-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th style="text-align: right;">Amount</th>
+                    <th style="text-align: center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionsTableBody">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+
+              <!-- Empty State -->
+              <div class="empty-state" id="txEmptyState" style="display: none;">
+                <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <h3 style="font-size: 1.05rem; margin-bottom: 4px; color: var(--text-main);">No Transactions Found</h3>
+                <p style="font-size: 0.85rem;">Try adjusting your search criteria or add a new transaction above.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ====================================================
+             TAB 3: SPENDING PATTERN ANALYSIS
+             ==================================================== -->
+        <div class="tab-pane" id="tab-analysis">
+          
+          <!-- Key Spending Highlight Cards -->
+          <div class="analysis-header-grid">
+            <!-- Highest Spending Category -->
+            <div class="highlight-card">
+              <div class="highlight-icon">🔥</div>
+              <div class="highlight-content">
+                <h4>Highest Spending Category</h4>
+                <div class="highlight-val" id="topSpendCatName">None</div>
+                <div class="highlight-sub" id="topSpendAmount">₹0.00</div>
+                <div class="highlight-sub" id="topSpendPct" style="color: var(--danger); font-weight: 600;">0% of expenses</div>
+              </div>
+            </div>
+
+            <!-- 50-30-20 Benchmark Summary -->
+            <div class="highlight-card" style="grid-column: span 2;">
+              <div class="highlight-icon" style="background-color: #EDE9FE; color: var(--primary);">⚖️</div>
+              <div class="highlight-content" style="width: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <h4>50 / 30 / 20 Financial Health Benchmark</h4>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">Standard Recommended Rule</span>
+                </div>
+
+                <div class="budget-rule-box">
+                  <!-- Needs -->
+                  <div class="budget-bar-item">
+                    <div class="budget-bar-labels">
+                      <span>Needs (Bills, Health, Food, Education)</span>
+                      <span id="analysisNeedsPct">0%</span>
+                    </div>
+                    <div class="budget-progress-track">
+                      <div class="budget-progress-fill fill-needs" id="fillNeeds" style="width: 0%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Wants -->
+                  <div class="budget-bar-item">
+                    <div class="budget-bar-labels">
+                      <span>Wants (Shopping, Entertainment, Travel)</span>
+                      <span id="analysisWantsPct">0%</span>
+                    </div>
+                    <div class="budget-progress-track">
+                      <div class="budget-progress-fill fill-wants" id="fillWants" style="width: 0%;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Savings -->
+                  <div class="budget-bar-item">
+                    <div class="budget-bar-labels">
+                      <span>Savings & Investments (Surplus)</span>
+                      <span id="analysisSavingsPct">0%</span>
+                    </div>
+                    <div class="budget-progress-track">
+                      <div class="budget-progress-fill fill-savings" id="fillSavings" style="width: 0%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="analysis-charts-grid">
+            <!-- Category Distribution Doughnut -->
+            <div class="card">
+              <div class="card-header-flex">
+                <div>
+                  <h3 class="card-title">Expense Proportions</h3>
+                  <p class="card-subtitle">Category percentage allocation</p>
+                </div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="analysisDoughnutChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Category Expense Comparison Bar -->
+            <div class="card">
+              <div class="card-header-flex">
+                <div>
+                  <h3 class="card-title">Category Ranking (₹)</h3>
+                  <p class="card-subtitle">Highest to lowest expenditure</p>
+                </div>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="analysisBarChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detailed Category Breakdown Progress List -->
+          <div class="card">
+            <h3 class="card-title" style="margin-bottom: 4px;">Comprehensive Category Breakdown</h3>
+            <p class="card-subtitle" style="margin-bottom: 16px;">Active breakdown of all expense categories with transaction counts</p>
+            <div id="categoryBreakdownList" class="category-progress-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ====================================================
+             TAB 4: AI SAVINGS ADVISOR
+             ==================================================== -->
+        <div class="tab-pane" id="tab-advisor">
+          
+          <!-- Hero Advisor Card -->
+          <div class="ai-advisor-hero">
+            <div class="ai-hero-inner">
+              <div class="ai-hero-text">
+                <h2>AI Savings & Budget Optimization Advisor</h2>
+                <p>
+                  Powered by <strong>Google Gemini API</strong>. Analyzes your actual income, category outlays, and savings velocity to calculate a financial health score and practical, tailored savings recommendations.
+                </p>
+              </div>
+              <button class="btn-primary" id="generateAiAdviceBtn" style="padding: 12px 24px; font-size: 0.95rem;">
+                <span>✨ Re-Analyze Financial Data</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Advisor Dynamic Results Container -->
+          <div id="aiRecommendationsContainer">
+            <!-- Populated via JavaScript on load or click -->
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ========================================================
+       MODAL 1: ADD TRANSACTION MODAL
+       ======================================================== -->
+  <div class="modal-overlay" id="addTransactionModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Record Financial Transaction</h3>
+        <button class="close-btn" id="closeAddModalBtn" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="addTransactionForm">
+        <!-- Transaction Type Radio Selection -->
+        <div class="form-group">
+          <label class="form-label">Transaction Type</label>
+          <div class="radio-group-types">
+            <label class="type-radio-label expense-label checked">
+              <input type="radio" name="txType" value="expense" checked>
+              <span>🔴 Expense</span>
+            </label>
+            <label class="type-radio-label income-label">
+              <input type="radio" name="txType" value="income">
+              <span>🟢 Income</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Description with AI Categorize Button -->
+        <div class="form-group">
+          <label class="form-label" for="txDescription">Description</label>
+          <div class="input-with-button">
+            <input type="text" id="txDescription" class="form-control" placeholder="e.g. Swiggy ₹350, Uber to station, Amazon order" required>
+            <button type="button" class="btn-ai-suggest" id="aiCategorizeBtn" title="Categorize using Gemini AI">
+              <span>✨ AI Categorize</span>
+            </button>
+          </div>
+          <div class="ai-suggestion-note" id="aiCategorizeNote"></div>
+        </div>
+
+        <!-- Amount and Date in 2 columns -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label" for="txAmount">Amount (₹ INR)</label>
+            <input type="number" id="txAmount" class="form-control" placeholder="0.00" step="0.01" min="0.01" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="txDate">Transaction Date</label>
+            <input type="date" id="txDate" class="form-control" required>
+          </div>
+        </div>
+
+        <!-- Category Dropdown -->
+        <div class="form-group">
+          <label class="form-label" for="txCategory">Category</label>
+          <select id="txCategory" class="form-control" required>
+            {% for cat in categories %}
+            <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelAddBtn">Cancel</button>
+          <button type="submit" class="btn-primary">
+            <span>Save Transaction</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL 2: GEMINI API KEY CONFIGURATION MODAL
+       ======================================================== -->
+  <div class="modal-overlay" id="apiKeyModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Gemini AI Configuration</h3>
+        <button class="close-btn" id="closeApiKeyModalBtn" aria-label="Close modal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">
+          Configure your Google Gemini API key to activate live generative AI categorization and personalized savings advice.
+        </p>
+
+        <div style="background-color: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px;">
+          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px;" id="apiKeyEngineDesc">
+            Current Mode: {{ ai_status.engine }}
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">
+            If no API key is set, PaisaPilot AI transparently runs in <strong>Deterministic Rule-Based Fallback Mode</strong> for college demonstration.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="geminiApiKeyInput">Google Gemini API Key</label>
+          <input type="password" id="geminiApiKeyInput" class="form-control" placeholder="Paste your AI Studio API key here...">
+          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">
+            Get a free API key at <a href="https://aistudio.google.com/" target="_blank" style="color: var(--primary);">aistudio.google.com</a>. Leave blank to switch back to offline fallback.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-primary" id="saveApiKeyBtn">Save & Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
+
